@@ -1,43 +1,46 @@
-//jshint esversion:6
-require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const ejs = require("ejs");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const passport = require("passport");
-const passportLocalMongoose = require("passport-local-mongoose");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const findOrCreate = require("mongoose-findorcreate");
-var nodemailer = require("nodemailer");
+previous code; can be looked up for changes
 
-const app = express();
-app.use(express.static("public"));
 
-app.set("view engine", "ejs");
-app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
-);
+// //jshint esversion:6
+// require("dotenv").config();
+// const express = require("express");
+// const bodyParser = require("body-parser");
+// const ejs = require("ejs");
+// const mongoose = require("mongoose");
+// const session = require("express-session");
+// const passport = require("passport");
+// const passportLocalMongoose = require("passport-local-mongoose");
+// const GoogleStrategy = require("passport-google-oauth20").Strategy;
+// const findOrCreate = require("mongoose-findorcreate");
+// var nodemailer = require("nodemailer");
 
-app.use(
-    session({
-        secret: "Our little secret.",
-        resave: false,
-        saveUninitialized: false,
-    })
-);
+// const app = express();
+// app.use(express.static("public"));
 
-app.use(passport.initialize());
-app.use(passport.session());
+// app.set("view engine", "ejs");
+// app.use(
+//     bodyParser.urlencoded({
+//         extended: true,
+//     })
+// );
 
-mongoose.connect("mongodb://localhost:27017/userDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
-mongoose.set("useCreateIndex", true);
+// app.use(
+//     session({
+//         secret: "Our little secret.",
+//         resave: false,
+//         saveUninitialized: false,
+//     })
+// );
 
-app.listen(3900, function () {
-    console.log("Successfully started on port 3900");
-});
+// app.use(passport.initialize());
+// app.use(passport.session());
+
+// mongoose.connect("mongodb://localhost:27017/userDB", {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
+// mongoose.set("useCreateIndex", true);
+
+// app.listen(3900, function () {
+//     console.log("Successfully started on port 3900");
+// });
