@@ -11,38 +11,42 @@ let errors =[];
 
 const { User, validateUser } = require("../models/User");
 
-//welcome page
-router.get('/',async(req,res) => {
-{
-     const { error } = validateUser(req.body);
-     if (error) {
-        res.status(400).send(error.details[0].message);
-         return;
-        }
-    }
-});
 
 
-//dashboard
- router.get('/dashboard',(req, res) => res.render('dashboard'));
 
-//  module.exports = User = mongoose.model('user', UserSchema)
-
+ 
 //LOGIN
-router.get('/auth',  async function CheckUser(req,res) {
- const username = req.body.email;
+    router.get("/",
+    passport.authenticate('local') , async (req, res) => {
+        try {
+            const users = await User.find();
+            res.send(users);
+        } catch (error) {
+            console.log("Error occurred: ", error);
+        }
+    })
+    
+
+
+
+
+
+//LOgin handle
+router.post('/',
+passport.authenticate('local') ,async function CheckUser(req, res ) {
+    const email = req.body.email;
     const password =  await req.body.password;
     const body = req.body;
     const errors = validationResult(req);
 try{
-                  const existing = User.findOne({email : username});
-if(!existing){
+                  const user = User.findOne({email : username});
+if(!user){
     return res.status(400).send('USER doesnot exit,please register first');
 }else{ 
-    const validPassword = await bcrypt.compare(password, User.password);
+    const validPassword = await bcrypt.compare(password, user.password);
             if(validPassword){
                req.logIn(user , function(){
-                   res.send('DONE!!!');
+                   res.send.status(200).send(user);
                })
             }else {
                 res.status(400).send('The entered password is incorrect!!')
@@ -51,31 +55,19 @@ if(!existing){
         }
     
 } catch (error) {
-    console.log(error);
+    console.log("Error Occured:",error);
 }
-});
-
-    
-
-
-
-
-
-//LOgin handle
-router.post('/auth',
-passport.authenticate('local') , function(req, res ) {
-    return res.send('req.user');
 });
 
 
 
 
 //Logout Handle
-router.get('/logout' ,async (req, res) => {
+router.post('/logout' ,async (req, res) => {
     try{
     const logout = await req.logout();
     }catch (error) {
-   return res.status(400).send('Unsuccesfull!');
+   return res.status(400).send(user);
     }
       
 });
