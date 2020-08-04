@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 const router = express.Router();
 const mongoose =require('mongoose');
@@ -33,13 +35,13 @@ const { User, validateUser } = require("../models/User");
 
 //LOgin handle
 router.post('/',
-passport.authenticate('local') ,async function CheckUser(req, res ) {
+passport.authenticate('local') ,async function(req, res ) {
     const email = req.body.email;
     const password =  await req.body.password;
     const body = req.body;
     const errors = validationResult(req);
 try{
-                  const user = User.findOne({email : username});
+                  const user = User.findOne({email : email});
 if(!user){
     return res.status(400).send('USER doesnot exit,please register first');
 }else{ 
