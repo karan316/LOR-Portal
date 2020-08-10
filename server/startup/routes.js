@@ -1,4 +1,5 @@
 const users = require("../routes/users");
+const auth = require("../routes/auth");
 const applications = require("../routes/applications");
 const departments = require("../routes/departments");
 const facultyUsers = require("../routes/facultyUsers");
@@ -14,4 +15,5 @@ module.exports = function (app) {
     app.use("/api/departments", departments);
     app.use("/api/student-users", studentUsers);
     app.use("/api/faculty-users", facultyUsers);
+    app.use("/api/auth", auth);
 };
