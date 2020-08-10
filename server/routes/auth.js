@@ -38,8 +38,7 @@ router.post('/',
 passport.authenticate('local') ,async function(req, res ) {
     const email = req.body.email;
     const password =  await req.body.password;
-    const body = req.body;
-    const errors = validationResult(req);
+    
 try{
                   const user = User.findOne({email : email});
 if(!user){
