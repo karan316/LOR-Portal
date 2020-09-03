@@ -18,15 +18,15 @@ const { User, validateUser } = require("../models/User");
 
  
 //LOGIN
-    router.get("/",
-    passport.authenticate('local') , async (req, res) => {
-        try {
-            const users = await User.find();
-            res.send(users);
-        } catch (error) {
-            console.log("Error occurred: ", error);
-        }
-    })
+//     router.get("/",
+//     passport.authenticate('local') , async (req, res) => {
+//         try {
+//             const users = await User.find();
+//             res.send(users);
+//         } catch (error) {
+//             console.log("Error occurred: ", error);
+//         }
+//     })
     
 
 
@@ -36,10 +36,10 @@ const { User, validateUser } = require("../models/User");
 //LOgin handle
 router.post('/',
 passport.authenticate('local') ,async function(req, res ) {
-    const email = req.body.email;
+ try{  
+ const email = req.body.email;
     const password =  await req.body.password;
     
-try{
                   const user = User.findOne({email : email});
 if(!user){
     return res.status(400).send('USER doesnot exit,please register first');
