@@ -1,6 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const { Application, validateApplication } = require("../models/application");
+const { FacultyUser } = require("../models/facultyUser");
+const { StudentUser } = require("../models/studentUser");
+
+router.get("/", async (req, res) => {
+    try {
+        const applications = await Application.find();
+        res.send(applications);
+    } catch (error) {
+        console.error(error);
+    }
+});
 
 router.get("/:id", async (req, res) => {
     try {
@@ -22,14 +33,24 @@ router.post("/", async (req, res) => {
             return;
         }
 
+        const facultyUser = await FacultyUser.findById(
+            req.body.facultyId
+        ).select(["info._id", "info.name", "info.department.name"]);
+        const studentUser = await StudentUser.findById(
+            req.body.studentId
+        ).select(["info._id", "info.name", "info.department.name"]);
+
         const application = new Application({
-            faculty: req.body.faculty,
-            student: req.body.student,
-            facultyDepartment: req.body.facultyDepartment,
-            studentDepartment: req.body.studentDepartment,
+            faculty: facultyUser,
+            student: studentUser,
             status: req.body.status,
         });
-        await application.save();
+        await application.save((error) => {
+            if (error) {
+                console.error(error);
+                return;
+            }
+        });
         res.send(application);
     } catch (error) {
         console.log("Error occurred: ", error);
@@ -38,12 +59,6 @@ router.post("/", async (req, res) => {
 // TODO: add auth, validateObjectId middleware
 router.patch("/:id", async (req, res) => {
     try {
-        const { error } = validateApplication(req.body);
-        if (error) {
-            res.status(400).send(error.details[0].message);
-            return;
-        }
-
         const application = await Application.findByIdAndUpdate(
             req.params.id,
             { status: req.body.status },

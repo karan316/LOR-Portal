@@ -1,27 +1,27 @@
-const Joi = require("@hapi/joi");
+const Joi = require("joi");
 const mongoose = require("mongoose");
 const { facultyUserSchema } = require("../models/facultyUser");
 const { studentUserSchema } = require("../models/studentUser");
 
 const applicationSchema = new mongoose.Schema({
     faculty: {
-        type: facultyUserSchema,
-        ref: "FacultyUser",
+        type: {
+            _id: mongoose.Schema.Types.ObjectId,
+            info: {
+                _id: mongoose.Schema.Types.ObjectId,
+                name: String,
+            },
+        },
         required: true,
     },
     student: {
-        type: studentUserSchema,
-        ref: "StudentUser",
-        required: true,
-    },
-    facultyDepartment: {
-        // TODO: replace with teacherUser
-        type: String,
-        required: true,
-    },
-    studentDepartment: {
-        // TODO: replace with studentUser
-        type: String,
+        type: {
+            _id: mongoose.Schema.Types.ObjectId,
+            info: {
+                _id: mongoose.Schema.Types.ObjectId,
+                name: String,
+            },
+        },
         required: true,
     },
     status: {
@@ -34,15 +34,13 @@ const Application = mongoose.model("Application", applicationSchema);
 
 function validateApplication(application) {
     const schema = Joi.object({
-        faculty: Joi.object(facultyUserSchema).required(),
-        student: Joi.object(studentUserSchema).required(),
-        facultyDepartment: Joi.string().required(),
-        studentDepartment: Joi.string().required(),
+        facultyId: Joi.string().required(),
+        studentId: Joi.string().required(),
         status: Joi.string().required(),
     });
     return schema.validate(application);
 }
 
 exports.Application = Application;
-exports.validateUser = validateApplication;
+exports.validateApplication = validateApplication;
 exports.applicationSchema = applicationSchema;

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const { FacultyUser, validateFacultyUser } = require("../models/facultyUser");
-const { Application } = require("../models/application");
 const { User } = require("../models/user");
 
 router.get("/", async (req, res) => {
@@ -15,9 +14,9 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     try {
-        const faculty = await FacultyUser.findById(req.params.id).populate(
-            "applications"
-        );
+        const faculty = await FacultyUser.findById(req.params.id).populate({
+            path: "applications",
+        });
         if (!faculty) {
             res.status(404).send("Faculty not found");
             return;
@@ -36,24 +35,28 @@ router.post("/", async (req, res) => {
             return;
         }
 
-        const applications = await Application.find({
-            "faculty._id": req.query.facultyId,
-        });
+        // const applications = await Application.find({
+        //     "faculty._id": req.query.facultyId,
+        // });
 
         const user = await User.findOne({
-            _id: req.query.userId,
+            _id: req.body.userId,
         });
 
         const faculty = new FacultyUser({
             info: user,
             regNo: req.body.regNo,
-            applications: applications ? applications : null,
+            // applications: applications ? applications : null,
         });
-        await faculty.save();
+        await faculty.save((error) => {
+            if (error) {
+                console.error("Error saving the document: ", error);
+                return;
+            }
+        });
         res.send(faculty);
     } catch (error) {
-        console.log("Error occurred: ", error);
+        console.error("Error occurred: ", error);
     }
 });
-
 module.exports = router;
