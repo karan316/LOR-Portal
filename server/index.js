@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const config = require('config')
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
+const passport = require('passport');
 const passportLocalMongoose  = require('passport-local-mongoose');
 
 
@@ -22,15 +23,22 @@ app.use(session({
     saveUninitialized: false
 }));
 
+
 //Passport middleware
-const passport = require('passport');
-require("./config/passport")(passport);//not very sure about the (passport),i was trying to check if not passing a parameter was the issue.
 app.use(passport.initialize());
 app.use(passport.session());
+require("./config/passport");//not very sure about the (passport),i was trying to check if not passing a parameter was the issue.
+
+// app.use(express.static("public"));
+// app.use(session({ secret: "cats" }));
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(passport.initialize());
+// app.use(passport.session());
 
 
 
 app.use('/auth', require('./routes/auth'));
+
 
 
 app.use(cors());

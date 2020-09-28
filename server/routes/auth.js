@@ -9,43 +9,26 @@ const passport = require('passport');
 const config = require('config');
 const Joi = require('joi');
 const _ = require('lodash');
-const bcrypt = require('bcryptjs');
 let errors =[];
 
 const { User, validateUser } = require("../models/user");
 
 
+// router.use(passport.initialize()
 
 
 
-//LOgin handle
-router.post('/',
-passport.authenticate('local') ,async function(req, res ) {
- try{  
-const email = req.body.email;
-const password =  await req.body.password;
-const user = User.findOne({email : email});
-if(!user){
-    return res.status(400).send('USER doesnot exit,please register first');
-}else{ 
-    const validPassword = await bcrypt.compare(password, user.password);
-            if(validPassword){
-               req.logIn(user , function(){
-                   res.send.status(200).send(user);
-               })
-            }else {
-                res.status(400).send('The entered password is incorrect!!')
-            }
-                
-        }
-   
-    } catch (error) {
-    console.log("Error Occured:",error);
-}
-});
 
-
-
+  router.post('/', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) {  return res.status(400).send('USER doesnot exit,please register first'); }
+      req.logIn(user, function(err) {
+        if (err) { return next(err); }
+        return res.status(400).send('done');
+      });
+    })(req, res, next);
+  })
 
 
 //Logout Handle

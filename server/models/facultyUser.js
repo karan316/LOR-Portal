@@ -28,7 +28,7 @@ function validateFacultyUser(facultyUser) {
     const schema = Joi.object({
         info: Joi.object(userSchema).required(),
         regNo: Joi.string().required(),
-        applications: Joi.array().required(),
+        applications: Joi.array(),
     });
     return schema.validate(facultyUser);
 }
