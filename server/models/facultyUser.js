@@ -1,4 +1,4 @@
-const Joi = require("@hapi/joi");
+const Joi = require("joi");
 const mongoose = require("mongoose");
 const { userSchema } = require("./user");
 const { applicationSchema } = require("./application");
@@ -26,7 +26,7 @@ const FacultyUser = mongoose.model("FacultyUser", facultyUserSchema);
 
 function validateFacultyUser(facultyUser) {
     const schema = Joi.object({
-        info: Joi.object(userSchema).required(),
+        userId: Joi.string().required(),
         regNo: Joi.string().required(),
         applications: Joi.array(),
     });

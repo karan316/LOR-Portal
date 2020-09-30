@@ -1,0 +1,3 @@
+applications are not getting populated in facultyUsers and studentUsers.
+remove password while getting the user by id in facultyUsers, studentUsers and users
+add query parameter routes to get applications for students and faculty based on their id ( check routes.txt)

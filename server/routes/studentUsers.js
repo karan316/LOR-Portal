@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { StudentUser, validateStudentUser } = require("../models/studentUser");
-const { Application } = require("../models/application");
-
+const { User } = require("../models/user");
 router.get("/", async (req, res) => {
     try {
         const students = await StudentUser.find();
@@ -35,21 +34,26 @@ router.post("/", async (req, res) => {
             return;
         }
 
-        const applications = await Application.find({
-            "student._id": req.params.studentId,
-        });
+        // const applications = await Application.find({
+        //     "student._id": req.params.studentId,
+        // });
 
         const user = await User.findOne({
-            _id: req.query.userId,
+            _id: req.body.userId,
         });
 
         const student = new StudentUser({
             info: user,
             regNo: req.body.regNo,
-            applications: applications ? applications : null,
+            // applications: applications ? applications : null,
         });
 
-        await student.save();
+        await student.save((error) => {
+            if (error) {
+                console.error("Error saving the document: ", error);
+                return;
+            }
+        });
         res.send(student);
     } catch (error) {
         console.log("Error occurred: ", error);

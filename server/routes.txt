@@ -1,32 +1,56 @@
 GET
 
-Applications for a teacher with a given id
-/teachers/:id/applications
-
-Student's applications
-/students/:id/applications
-
 All teachers
-/teachers
+/faculty-users
 
 All departments
 /departments
 
-Application based on ID (for teachers)
-/applications/:id
+Application based on ID (for faculty)
+/applications/?facultyId=5f2180f3a095d3bf3a8431d3
+
+
+Application based on ID (for student)
+/applications/?studentId=5f2180f3a095d3bf3a8431d3
 
 POST
 
+
 User registration
-/students
+/users
 
 User login
-/login
+/auth
+
+Student User registration
+/student-users
+
+{
+    "userId": "5f2180f3a095d3bf3a8423d3", //id of existing user who is a student
+    "regNo": "12348923"
+}
+
+Faculty User registration
+
+/faculty-users
+{
+    "userId": "5f2180f3a095d3bf3a8431d3", //id of existing user who is a faculty
+    "regNo": "12348923"
+}
 
 Submit Applications
 /applications
 
-PUT
+{
+    "facultyId": "5f59c5cf134e96a4e86cfbc1",
+    "studentId": "5f59cb12af554aadcdfea737",
+    "status": "Pending"
+}
+
+PATCH
 
 Teacher changes the status of an application
 /applications/:id
+{
+    "status" : "Accepted"
+}
