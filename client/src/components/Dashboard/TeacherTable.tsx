@@ -13,16 +13,14 @@ function TeacherTable() {
         <div>
             <Header
                 floated='left'
-                style={{ fontSize: "3.5rem", marginBottom: "1em" }}
-            >
+                style={{ fontSize: "3.5rem", marginBottom: "1em" }}>
                 Applications
             </Header>
             <Table
                 striped
                 fixed
                 verticalAlign='middle'
-                style={{ fontSize: "1.5rem" }}
-            >
+                style={{ fontSize: "1.5rem" }}>
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell>Application ID</Table.HeaderCell>
@@ -36,7 +34,7 @@ function TeacherTable() {
                 <Table.Body>
                     {/*TODO: replace with teacher object's applications.*/}
                     {teacherApplications.map((teacherApplication) => (
-                        <Table.Row>
+                        <Table.Row key={teacherApplication.id}>
                             <Table.Cell>{teacherApplication.id}</Table.Cell>
                             <Table.Cell>
                                 {teacherApplication.student}
@@ -50,7 +48,10 @@ function TeacherTable() {
                                 {/* <Link
                                     to={`/users/${teacher.info.id}/${teacher.info.applications[0].id}`}
                                 > */}
-                                <ViewButton applications={teacher.applications} applicationId={teacherApplication.id} />
+                                <ViewButton
+                                    applications={teacher.applications}
+                                    applicationId={teacherApplication.id}
+                                />
                                 {/* </Link> */}
                             </Table.Cell>
                         </Table.Row>

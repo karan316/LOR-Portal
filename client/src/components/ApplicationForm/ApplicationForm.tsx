@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { AxiosResponse } from "axios";
+import http from "../../services/http";
+import {department, departmentList} from "../../services/departments";
 import {
     Button,
     Form,
@@ -8,13 +11,11 @@ import {
     Container,
 } from "semantic-ui-react";
 import { getTeacherList } from "../../services/teachers";
-import { getDepartmentList } from "../../services/departments";
 import { useHistory } from "react-router-dom";
 import { Formik, Field } from "formik";
 import * as yup from "yup";
 
 const teachers = getTeacherList();
-const departments = getDepartmentList();
 
 const validationSchema = yup.object({
     firstName: yup.string().required("First Name is required."),
@@ -49,8 +50,50 @@ let submitData: SubmitData = {
     department: "",
     registrationNumber: "",
 };
-
 function ApplicationForm() {
+    const [departments, setDepartments] = useState([]);
+    const [faculties, setFaculties] = useState([]);
+    async function fetchDepartments () {
+        try {
+            const {data}: AxiosResponse = await http.get(
+                "http://localhost:4000/api/departments"
+            );
+            setDepartments(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // async function fetchFaculty () {
+    //     try {
+    //         const {data}: AxiosResponse = await http.get(
+    //             "http://localhost:4000/api/departments"
+    //         );
+    //         setDepartments(data);
+    //         console.log(data);
+
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+    useEffect(() => {
+        fetchDepartments();
+    }, []);
+    const departmentOptions = departments.map(
+        (dept: department): departmentList => {
+            return {
+                key: dept._id,
+                text: dept.name,
+                value: dept.name,
+            };
+        }
+    );
+    console.log("Departments: ", departments);
+    
+    // useEffect(() => {
+    //     fetchDepartments();
+    // });
+    
     const history = useHistory();
 
     const handleTeacherChange = (
@@ -149,7 +192,7 @@ function ApplicationForm() {
                                 label='Your Department'
                                 name='department'
                                 required
-                                options={departments}
+                                options={departmentOptions}
                                 placeholder='Your Department'
                                 onChange={handleDepartmentChange}
                             />

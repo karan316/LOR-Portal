@@ -28,22 +28,19 @@ function Login() {
                 style={{
                     fontSize: "4rem",
                     marginTop: "2em",
-                }}
-            >
+                }}>
                 Welcome to LOR Portal
             </Header>
             <Grid
                 textAlign='center'
                 style={{ marginTop: "3em" }}
-                verticalAlign='middle'
-            >
+                verticalAlign='middle'>
                 <Grid.Column style={{ maxWidth: 500, marginBottom: "10em" }}>
                     <Header
                         as='h1'
                         color='violet'
                         textAlign='center'
-                        style={{ fontSize: "2em", marginBottom: "1em" }}
-                    >
+                        style={{ fontSize: "2em", marginBottom: "1em" }}>
                         Log In
                     </Header>
                     <Formik
@@ -52,15 +49,16 @@ function Login() {
                             password: "",
                         }}
                         validationSchema={validationSchema}
-                        onSubmit={(data, { setSubmitting, resetForm }) => {
+                        onSubmit={async (
+                            data,
+                            { setSubmitting, resetForm }
+                        ) => {
                             setSubmitting(true);
-                            // STORE INTO DATABASE
                             console.log("Submit: ", data);
                             history.push("/dashboard");
                             setSubmitting(false);
                             resetForm();
-                        }}
-                    >
+                        }}>
                         {({ values, errors, isSubmitting }) => (
                             <FormikForm>
                                 <Segment stacked size='big'>
@@ -83,14 +81,13 @@ function Login() {
                                     type='submit'
                                     color='violet'
                                     fluid
-                                    size='large'
-                                >
+                                    size='large'>
                                     LOGIN
                                 </Button>
-                                {/* <pre>{JSON.stringify(values, null, 2)}</pre>
+                                <pre>{JSON.stringify(values, null, 2)}</pre>
                                 <pre>
                                     Errors: {JSON.stringify(errors, null, 2)}
-                                </pre> */}
+                                </pre>
                             </FormikForm>
                         )}
                     </Formik>
