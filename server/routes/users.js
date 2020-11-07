@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
 const { Department } = require("../models/department");
+const { Application } = require("../models/application");
 
 const { User, validateUser } = require("../models/user");
 
@@ -10,6 +11,23 @@ router.get("/", async (req, res) => {
     try {
         const users = await User.find();
         res.send(users);
+    } catch (error) {
+        console.log("Error occurred: ", error);
+    }
+});
+
+
+router.get("/:id", async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).populate({path: 'applications', model: "Application"});
+        if(user.populated())
+            console.log("user is populated", user.applications);
+        else console.log("user is not populated", user.applications);
+        if (!user) {
+            res.status(404).send("User not found");
+            return;
+        }
+        res.send(user);
     } catch (error) {
         console.log("Error occurred: ", error);
     }
@@ -31,7 +49,7 @@ router.post("/", async (req, res) => {
         });
 
         newUser = new User(
-            _.pick(req.body, ["email", "password", "name", "type"])
+            _.pick(req.body, ["email", "password", "name", "type", "regNo" ])
         );
 
         newUser.department = department;

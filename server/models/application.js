@@ -1,7 +1,5 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
-const { facultyUserSchema } = require("../models/facultyUser");
-const { studentUserSchema } = require("../models/studentUser");
 
 const applicationSchema = new mongoose.Schema({
     faculty: {

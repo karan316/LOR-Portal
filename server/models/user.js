@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
+const { Application } = require("./application");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -29,6 +30,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    regNo: {
+        type: String,
+        required: true,
+    },
+    applications: [
+        [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Application",
+        }],
+    ],
 });
 
 const User = mongoose.model("User", userSchema);
@@ -40,6 +51,7 @@ function validateUser(user) {
         password: Joi.string().required().min(5).max(100),
         type: Joi.string().required(),
         department: Joi.string().required(),
+        regNo: Joi.string().required(),
     });
     return schema.validate(user);
 }

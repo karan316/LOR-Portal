@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Application, validateApplication } = require("../models/application");
-const { FacultyUser } = require("../models/facultyUser");
-const { StudentUser } = require("../models/studentUser");
+const { User } = require("../models/user");
 
 router.get("/", async (req, res) => {
     try {
@@ -33,12 +32,12 @@ router.post("/", async (req, res) => {
             return;
         }
 
-        const facultyUser = await FacultyUser.findById(
+        const facultyUser = await User.findById(
             req.body.facultyId
-        ).select(["info._id", "info.name", "info.department.name"]);
-        const studentUser = await StudentUser.findById(
+        ).select(["_id", "name", "department.name"]);
+        const studentUser = await User.findById(
             req.body.studentId
-        ).select(["info._id", "info.name", "info.department.name"]);
+        ).select(["_id", "name", "department.name"]);
 
         const application = new Application({
             faculty: facultyUser,

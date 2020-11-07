@@ -55,7 +55,7 @@ function ApplicationForm() {
     const [faculties, setFaculties] = useState([]);
     async function fetchDepartments () {
         try {
-            const {data}: AxiosResponse = await http.get(
+            const { data }: AxiosResponse = await http.get(
                 "http://localhost:4000/api/departments"
             );
             setDepartments(data);
