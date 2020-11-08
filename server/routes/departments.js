@@ -11,6 +11,17 @@ router.get("/", async (req, res) => {
     }
 });
 
+router.get("/:id", async (req, res) => {
+    try {
+        const department = await Department.findById(req.params.id);
+        res.send(department);
+    } catch (error) {
+        res.send(error);
+        console.log("Error occurred: ", error);
+    }
+});
+
+
 router.post("/", async (req, res) => {
     try {
         const { error } = validateDepartment(req.body);

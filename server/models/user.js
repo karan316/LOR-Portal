@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
 const { Application } = require("./application");
+const jwt = "jsonwebtoken";
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -44,7 +45,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-function validateUser(user) {
+function validateRegisterInput(user) {
     const schema = Joi.object({
         name: Joi.string().min(3).max(50).required(),
         email: Joi.string().min(5).max(50).required(),
@@ -56,6 +57,26 @@ function validateUser(user) {
     return schema.validate(user);
 }
 
+function validateLoginInput(user) {
+    const schema = Joi.object({
+        email: Joi.string().min(5).max(50).required(),
+        password: Joi.string().required().min(5).max(100)
+    })
+
+    return schema.validate(user);
+}
+
+function generateToken(user) {
+    return jwt.sign(
+        {
+            email: user.email,
+            regNo: user.regNo,
+            id: user._id
+        }
+    )
+}
+
 exports.User = User;
 exports.userSchema = userSchema;
-exports.validateUser = validateUser;
+exports.validateRegisterInput = validateRegisterInput;
+exports.validateLoginInput = validateLoginInput;

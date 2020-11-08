@@ -5,7 +5,7 @@ const router = express.Router();
 const { Department } = require("../models/department");
 const { Application } = require("../models/application");
 
-const { User, validateUser } = require("../models/user");
+const { User, validateRegisterInput } = require("../models/user");
 
 router.get("/", async (req, res) => {
     try {
@@ -35,7 +35,7 @@ router.get("/:id", async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        const { error } = validateUser(req.body);
+        const { error } = validateRegisterInput(req.body);
         if (error) {
             res.status(400).send(error.details[0].message);
             return;
@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
 
         let newUser = await User.findOne({ email: req.body.email });
         if (newUser) return res.status(400).send("User already registered.");
-
+        // TODO: check for duplicate registration number and email
         const department = await Department.findOne({
             name: req.body.department,
         });
