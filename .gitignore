@@ -1,2 +1,3 @@
 strapi-backend/
-server/config
+server/config/
+pending.txt
