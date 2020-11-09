@@ -13,6 +13,13 @@ const validationSchema = yup.object({
     password: yup.string().required("Password is required.").min(5).max(30),
 });
 
+const initialValues = {
+    name: "",
+    regNo: "",
+    email: "",
+    password: "",
+};
+
 function Register() {
     const history = useHistory();
     return (
@@ -20,24 +27,17 @@ function Register() {
             <Grid
                 textAlign='center'
                 style={{ height: "100vh" }}
-                verticalAlign='middle'
-            >
+                verticalAlign='middle'>
                 <Grid.Column style={{ maxWidth: 450 }}>
                     <Header
                         as='h1'
                         color='violet'
                         textAlign='center'
-                        style={{ fontSize: "2.5em", marginBottom: "1em" }}
-                    >
+                        style={{ fontSize: "2.5em", marginBottom: "1em" }}>
                         Register
                     </Header>
                     <Formik
-                        initialValues={{
-                            name: "",
-                            regNo: "",
-                            email: "",
-                            password: "",
-                        }}
+                        initialValues={initialValues}
                         validationSchema={validationSchema}
                         onSubmit={(data, { setSubmitting, resetForm }) => {
                             setSubmitting(true);
@@ -46,8 +46,7 @@ function Register() {
                             history.push("/dashboard");
                             setSubmitting(false);
                             resetForm();
-                        }}
-                    >
+                        }}>
                         {({ values, errors, isSubmitting }) => (
                             <FormikForm>
                                 <Segment stacked size='big'>
@@ -83,8 +82,7 @@ function Register() {
                                     type='submit'
                                     color='violet'
                                     fluid
-                                    size='large'
-                                >
+                                    size='large'>
                                     REGISTER
                                 </Button>
                                 {/* <pre>{JSON.stringify(values, null, 2)}</pre>
