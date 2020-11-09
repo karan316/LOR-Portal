@@ -2,12 +2,12 @@ const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
 const { Department } = require("../models/department");
-
 const {
     User,
     validateRegisterInput,
     generateToken,
 } = require("../models/user");
+const auth = require("../middlewares/auth");
 
 router.get("/", async (req, res) => {
     try {
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) {

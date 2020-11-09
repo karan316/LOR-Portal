@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Application, validateApplication } = require("../models/application");
 const { User } = require("../models/user");
+const auth = require("../middlewares/auth");
 
 router.get("/", async (req, res) => {
     try {
@@ -24,7 +25,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // TODO: add auth, validateObjectId middleware
-router.post("/", async (req, res) => {
+router.post("/", auth, async (req, res) => {
     try {
         const { error } = validateApplication(req.body);
         if (error) {
@@ -60,7 +61,7 @@ router.post("/", async (req, res) => {
     }
 });
 // TODO: add auth, validateObjectId middleware
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", auth, async (req, res) => {
     try {
         const application = await Application.findByIdAndUpdate(
             req.params.id,
@@ -79,7 +80,7 @@ router.patch("/:id", async (req, res) => {
     }
 });
 // TODO: add auth, validateObjectId middleware
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
     try {
         const application = await Application.findByIdAndDelete(req.params.id);
 
