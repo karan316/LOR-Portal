@@ -1,8 +1,7 @@
 const bcrypt = require("bcryptjs");
 const express = require("express");
-const { User, validateLoginInput, generateToken } = require("../models/user");
-
 const router = express.Router();
+const { User, validateLoginInput, generateToken } = require("../models/user");
 
 router.post("/", async (req, res) => {
     try {
@@ -23,13 +22,20 @@ router.post("/", async (req, res) => {
             return;
         }
         const token = generateToken(user);
-        res.send({
-            ...user._doc,
-            id: user._id,
+        const response = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            department: user.department,
+            type: user.type,
+            regNo: user.regNo,
             token,
-        });
+        };
+        res.send(response);
     } catch (error) {
         console.error(error);
         res.status(500).send("Unexpected error occurred");
     }
 });
+
+module.exports = router;

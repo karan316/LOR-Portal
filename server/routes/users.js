@@ -1,11 +1,13 @@
-const _ = require("lodash");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
 const { Department } = require("../models/department");
-const { Application } = require("../models/application");
 
-const { User, validateRegisterInput } = require("../models/user");
+const {
+    User,
+    validateRegisterInput,
+    generateToken,
+} = require("../models/user");
 
 router.get("/", async (req, res) => {
     try {
@@ -16,13 +18,9 @@ router.get("/", async (req, res) => {
     }
 });
 
-
 router.get("/:id", async (req, res) => {
     try {
-        const user = await User.findById(req.params.id).populate({path: 'applications', model: "Application"});
-        if(user.populated())
-            console.log("user is populated", user.applications);
-        else console.log("user is not populated", user.applications);
+        const user = await User.findById(req.params.id);
         if (!user) {
             res.status(404).send("User not found");
             return;
@@ -41,25 +39,47 @@ router.post("/", async (req, res) => {
             return;
         }
 
-        let newUser = await User.findOne({ email: req.body.email });
-        if (newUser) return res.status(400).send("User already registered.");
-        // TODO: check for duplicate registration number and email
+        const matchingEmail = await User.findOne({ email: req.body.email });
+        const matchingRegNo = await User.findOne({ regNo: req.body.regNo });
+        if (matchingEmail)
+            return res
+                .status(400)
+                .send("User with this email is already registered.");
+        if (matchingRegNo)
+            return res
+                .status(400)
+                .send(
+                    "User with this registration number is already registered."
+                );
         const department = await Department.findOne({
             name: req.body.department,
         });
-
-        newUser = new User(
-            _.pick(req.body, ["email", "password", "name", "type", "regNo" ])
-        );
-
+        const { email, password, name, type, regNo } = req.body;
+        let newUser = new User({
+            email,
+            password,
+            name,
+            regNo,
+            type,
+        });
         newUser.department = department;
-
         const salt = await bcrypt.genSalt(10);
         newUser.password = await bcrypt.hash(newUser.password, salt);
-        await newUser.save();
-        res.send(newUser);
+        const token = generateToken(newUser);
+        const response = {
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+            department: newUser.department,
+            type: newUser.type,
+            regNo: newUser.regNo,
+            token,
+        };
+        newUser = await newUser.save();
+
+        res.send(response);
     } catch (error) {
-        console.log(error);
+        console.log("Internal Server Error:", error);
     }
 });
 

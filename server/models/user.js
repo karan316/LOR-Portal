@@ -2,7 +2,6 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 const config = require("config");
 const jwt = require("jsonwebtoken");
-const { Application } = require("./application");
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -36,14 +35,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    applications: [
-        [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Application",
-            },
-        ],
-    ],
 });
 
 const User = mongoose.model("User", userSchema);

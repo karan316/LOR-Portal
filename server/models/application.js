@@ -8,6 +8,10 @@ const applicationSchema = new mongoose.Schema({
             info: {
                 _id: mongoose.Schema.Types.ObjectId,
                 name: String,
+                department: {
+                    _id: mongoose.Schema.Types.ObjectId,
+                    name: String,
+                },
             },
         },
         required: true,
@@ -18,8 +22,16 @@ const applicationSchema = new mongoose.Schema({
             info: {
                 _id: mongoose.Schema.Types.ObjectId,
                 name: String,
+                department: {
+                    _id: mongoose.Schema.Types.ObjectId,
+                    name: String,
+                },
             },
         },
+        required: true,
+    },
+    statementOfPurpose: {
+        type: String,
         required: true,
     },
     status: {
@@ -34,6 +46,7 @@ function validateApplication(application) {
     const schema = Joi.object({
         facultyId: Joi.string().required(),
         studentId: Joi.string().required(),
+        statementOfPurpose: Joi.string().required().min(10),
         status: Joi.string().required(),
     });
     return schema.validate(application);

@@ -32,16 +32,20 @@ router.post("/", async (req, res) => {
             return;
         }
 
-        const facultyUser = await User.findById(
-            req.body.facultyId
-        ).select(["_id", "name", "department.name"]);
-        const studentUser = await User.findById(
-            req.body.studentId
-        ).select(["_id", "name", "department.name"]);
-
+        const facultyUser = await User.findById(req.body.facultyId);
+        const studentUser = await User.findById(req.body.studentId);
         const application = new Application({
-            faculty: facultyUser,
-            student: studentUser,
+            faculty: {
+                _id: facultyUser._id,
+                name: facultyUser.name,
+                department: facultyUser.department,
+            },
+            student: {
+                _id: studentUser._id,
+                name: studentUser.name,
+                department: facultyUser.department,
+            },
+            statementOfPurpose: req.body.statementOfPurpose,
             status: req.body.status,
         });
         await application.save((error) => {
