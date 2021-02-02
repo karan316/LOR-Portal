@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import "semantic-ui-css/semantic.min.css";
 import {
     Button,
@@ -7,19 +7,42 @@ import {
     Message,
     Segment,
     Container,
+    Form,
 } from "semantic-ui-react";
-import * as yup from "yup";
-import { Formik, Form as FormikForm } from "formik";
-import { InputField } from "../common/InputField";
 import { useHistory } from "react-router-dom";
+import { AxiosResponse } from "axios";
 
-const validationSchema = yup.object({
-    email: yup.string().email().required("Email is required."),
-    password: yup.string().required("Password is required.").min(5).max(30),
-});
+import { useForm } from "../../hooks/useForm";
+import { login } from "../../services/authService";
+import { AuthContext } from "../../context/authContext";
 
 function Login() {
+    const initialState = {
+        email: "",
+        password: "",
+    };
+    const [errors, setErrors] = useState({});
+    const { setUser } = useContext(AuthContext);
     const history = useHistory();
+
+    const { onChange, onSubmit, values } = useForm(
+        loginUserCallback,
+        initialState
+    );
+
+    async function loginUserCallback() {
+        let response: AxiosResponse | undefined;
+        try {
+            response = await login(values);
+            console.log("LOGIN SUCCESSFUL", response.data);
+            setUser(response.data);
+            history.push("/dashboard");
+        } catch (error) {
+            setErrors(error);
+            console.log("Server Error occurred: ", error);
+        }
+    }
+
     return (
         <Container style={{ textAlign: "center", overflow: "hidden" }}>
             <Header
@@ -29,7 +52,7 @@ function Login() {
                     fontSize: "4rem",
                     marginTop: "2em",
                 }}>
-                Welcome to LOR Portal
+                Welcome to <span style={{ color: "#5829bb" }}> Easy LOR</span>
             </Header>
             <Grid
                 textAlign='center'
@@ -43,54 +66,30 @@ function Login() {
                         style={{ fontSize: "2em", marginBottom: "1em" }}>
                         Log In
                     </Header>
-                    <Formik
-                        initialValues={{
-                            email: "",
-                            password: "",
-                        }}
-                        validationSchema={validationSchema}
-                        onSubmit={async (
-                            data,
-                            { setSubmitting, resetForm }
-                        ) => {
-                            setSubmitting(true);
-                            console.log("Submit: ", data);
-                            history.push("/dashboard");
-                            setSubmitting(false);
-                            resetForm();
-                        }}>
-                        {({ values, errors, isSubmitting }) => (
-                            <FormikForm>
-                                <Segment stacked size='big'>
-                                    <InputField
-                                        icon='user'
-                                        placeholder='Email ID'
-                                        name='email'
-                                        type='email'
-                                    />
-                                    <InputField
-                                        icon='lock'
-                                        placeholder='Password'
-                                        name='password'
-                                        type='password'
-                                        style={{ marginTop: "20px" }}
-                                    />
-                                </Segment>
-                                <Button
-                                    disabled={isSubmitting}
-                                    type='submit'
-                                    color='violet'
-                                    fluid
-                                    size='large'>
-                                    LOGIN
-                                </Button>
-                                <pre>{JSON.stringify(values, null, 2)}</pre>
-                                <pre>
-                                    Errors: {JSON.stringify(errors, null, 2)}
-                                </pre>
-                            </FormikForm>
-                        )}
-                    </Formik>
+                    <Form onSubmit={onSubmit} style={{ textAlign: "left" }}>
+                        <Segment stacked size='big'>
+                            <Form.Input
+                                name='email'
+                                type='email'
+                                required
+                                label='Email ID'
+                                placeholder='Email ID'
+                                onChange={onChange}
+                            />
+
+                            <Form.Input
+                                name='password'
+                                type='password'
+                                required
+                                label='Password'
+                                placeholder='Password'
+                                onChange={onChange}
+                            />
+                        </Segment>
+                        <Button type='submit' color='violet' fluid size='large'>
+                            LOGIN
+                        </Button>
+                    </Form>
                     <Message>
                         New user?
                         <a href='/register'> Register</a>

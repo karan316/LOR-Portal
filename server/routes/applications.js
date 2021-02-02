@@ -13,10 +13,10 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:facultyId", async (req, res) => {
     try {
         const applications = await Application.find({
-            "faculty._id": req.params.id,
+            "faculty._id": req.params.facultyId,
         });
         res.send(applications);
     } catch (error) {
@@ -24,6 +24,16 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+router.get("/:studentId", async (req, res) => {
+    try {
+        const applications = await Application.find({
+            "student._id": req.params.studentId,
+        });
+        res.send(applications);
+    } catch (error) {
+        console.log("Error occurred: ", error);
+    }
+});
 // TODO: add auth, validateObjectId middleware
 router.post("/", auth, async (req, res) => {
     try {

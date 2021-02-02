@@ -18,8 +18,15 @@ if (localStorage.getItem("jwtToken")) {
 
 // used to access our context
 const AuthContext = createContext({
-    user: {},
-    login: (userData: User) => {},
+    user: {
+        email: "",
+        name: "",
+        department: { name: "" },
+        type: "",
+        regNo: "",
+        token: "",
+    },
+    setUser: (userData: User) => {},
     logout: () => {},
 });
 
@@ -28,7 +35,7 @@ interface Action {
     payload?: any;
 }
 interface AuthReducerState {
-    user?:
+    user:
         | {
               email: string;
               name: string;
@@ -37,8 +44,8 @@ interface AuthReducerState {
               regNo: string;
               token: string;
           }
-        | undefined
-        | null;
+        | null
+        | undefined;
 }
 function authReducer(
     state: AuthReducerState,
@@ -47,8 +54,8 @@ function authReducer(
     switch (action.type) {
         case "LOGIN":
             return {
-                ...state, // spread the existing state
-                user: action.payload, // payload has the user
+                ...state,
+                user: action.payload,
             };
 
         case "LOGOUT":
@@ -62,11 +69,10 @@ function authReducer(
 }
 
 interface AuthProps {}
-// used to provide the access of the context
 function AuthProvider(props: AuthProps) {
     const [state, dispatch] = useReducer(authReducer, initialState);
 
-    function login(userData: User) {
+    function setUser(userData: User) {
         localStorage.setItem("jwtToken", userData.token!);
         dispatch({ type: "LOGIN", payload: userData });
     }
@@ -78,7 +84,7 @@ function AuthProvider(props: AuthProps) {
 
     return (
         <AuthContext.Provider
-            value={{ user: state.user!, login, logout }}
+            value={{ user: state.user!, setUser, logout }}
             {...props}
         />
     );

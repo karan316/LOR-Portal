@@ -1,5 +1,5 @@
 import http from "./http";
-import { API_URL, SECRET_KEY } from "../config";
+import { API_URL } from "../config";
 
 const API_ENDPOINT = API_URL + "/users";
 
@@ -12,14 +12,23 @@ export interface User {
     regNo: string;
     token?: string;
 }
+// TODO: add register type
+// export type registerInput = {
+//     name: string;
+//     email: string;
+//     password: string;
+//     type: string;
+//     department: string;
+//     regNo: string;
+// };
 
-export function register(user: User) {
-    return http.post(API_ENDPOINT, {
+export async function register(user: any) {
+    return await http.post(API_ENDPOINT, {
         name: user.name,
         email: user.email,
         password: user.password,
         type: user.type,
-        department: user.type,
+        department: user.department,
         regNo: user.regNo,
     });
 }

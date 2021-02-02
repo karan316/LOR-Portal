@@ -24,8 +24,10 @@ const userSchema = new mongoose.Schema({
         maxlength: 100,
     },
     department: {
-        type: String,
-        required: true,
+        name: {
+            type: String,
+            required: true,
+        },
     },
     type: {
         type: String,
@@ -65,6 +67,8 @@ function generateToken(user) {
         {
             email: user.email,
             regNo: user.regNo,
+            name: user.name,
+            type: user.type,
             id: user._id,
         },
         config.SECRET_KEY,

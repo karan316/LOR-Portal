@@ -17,7 +17,6 @@ router.get("/", async (req, res) => {
         console.log("Error occurred: ", error);
     }
 });
-
 router.get("/:id", auth, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -33,9 +32,10 @@ router.get("/:id", auth, async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
+        console.log("Submit data: ", req.body);
         const { error } = validateRegisterInput(req.body);
         if (error) {
-            res.status(400).send(error.details[0].message);
+            res.status(400).send(error);
             return;
         }
 
@@ -79,6 +79,7 @@ router.post("/", async (req, res) => {
 
         res.send(response);
     } catch (error) {
+        res.send(error);
         console.log("Internal Server Error:", error);
     }
 });

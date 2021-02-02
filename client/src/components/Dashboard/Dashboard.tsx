@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../context/authContext";
 import StudentDashboard from "./StudentDashboard";
 import TeacherDashboard from "./TeacherDashboard";
-import { getCurrentUser } from "../../services/user";
-function Dashboard() {
-    const user = getCurrentUser();
-    const [role, setRole] = useState("");
 
+function Dashboard() {
+    const [role, setRole] = useState("");
+    const { user } = useContext(AuthContext);
     useEffect(() => {
-        setRole(user.info.type);
+        setRole(user.type);
         return () => {};
-    }, [user.info.type]);
+    }, [user.type]);
 
     if (role === "student") {
         return <StudentDashboard />;
-    } else if (role === "teacher") {
+    } else if (role === "faculty") {
         return <TeacherDashboard />;
     }
     return null;

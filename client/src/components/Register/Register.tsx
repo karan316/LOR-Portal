@@ -1,104 +1,195 @@
-import React from "react";
+import React, { useState } from "react";
 import "semantic-ui-css/semantic.min.css";
-import { Button, Grid, Header, Message, Segment } from "semantic-ui-react";
-import { Formik, Form as FormikForm } from "formik";
-import * as yup from "yup";
+import {
+    Button,
+    Grid,
+    Header,
+    Message,
+    Segment,
+    Form,
+} from "semantic-ui-react";
+import { useQuery } from "react-query";
+import { AxiosResponse } from "axios";
 import { useHistory } from "react-router-dom";
-import { InputField } from "../common/InputField";
 
-const validationSchema = yup.object({
-    name: yup.string().required("Name is a required.").max(50),
-    regNo: yup.string().required("Registration Number is required.").max(8),
-    email: yup.string().email().required("Email is required."),
-    password: yup.string().required("Password is required.").min(5).max(30),
-});
-
-const initialValues = {
-    name: "",
-    regNo: "",
-    email: "",
-    password: "",
-};
+import { useForm } from "../../hooks/useForm";
+import { register } from "../../services/userService";
+import http from "../../services/http";
+import { department, departmentList } from "../../services/departments";
 
 function Register() {
     const history = useHistory();
+    const initialState = {
+        name: "",
+        regNo: "",
+        email: "",
+        password: "",
+        department: "",
+        type: "",
+    };
+    const [errors, setErrors] = useState({});
+
+    const { onChange, onSubmit, onSelectChange, values } = useForm(
+        registerUserCallback,
+        initialState
+    );
+    const { data, isLoading } = useQuery("fetchDepartments", async () => {
+        const { data } = await http.get(
+            "http://localhost:4000/api/departments"
+        );
+        return data;
+    });
+
+    let departmentOptions: departmentList[] = [];
+    if (data) {
+        console.log(data);
+
+        const departments: department[] = data;
+        departmentOptions = departments.map(
+            (dept: department): departmentList => {
+                return {
+                    key: dept._id,
+                    text: dept.name,
+                    value: dept.name,
+                };
+            }
+        );
+    }
+    const typeOptions = [
+        {
+            key: "Student",
+            text: "Student",
+            value: "student",
+        },
+        {
+            key: "Faculty",
+            text: "Faculty",
+            value: "faculty",
+        },
+    ];
+
+    async function registerUserCallback() {
+        let response: AxiosResponse | undefined;
+        try {
+            response = await register(values);
+            console.log(response.data);
+            localStorage.setItem("jwtToken", response.data.token);
+            history.push("/dashboard");
+        } catch (error) {
+            setErrors(error);
+            console.log("Server Error occurred: ", error);
+        }
+    }
     return (
-        <div>
-            <Grid
-                textAlign='center'
-                style={{ height: "100vh" }}
-                verticalAlign='middle'>
-                <Grid.Column style={{ maxWidth: 450 }}>
-                    <Header
-                        as='h1'
-                        color='violet'
-                        textAlign='center'
-                        style={{ fontSize: "2.5em", marginBottom: "1em" }}>
-                        Register
-                    </Header>
-                    <Formik
-                        initialValues={initialValues}
-                        validationSchema={validationSchema}
-                        onSubmit={(data, { setSubmitting, resetForm }) => {
-                            setSubmitting(true);
-                            // STORE INTO DATABASE
-                            console.log("Submit: ", data);
-                            history.push("/dashboard");
-                            setSubmitting(false);
-                            resetForm();
-                        }}>
-                        {({ values, errors, isSubmitting }) => (
-                            <FormikForm>
-                                <Segment stacked size='big'>
-                                    <InputField
-                                        name='name'
-                                        type='input'
-                                        placeholder='Name'
-                                        style={{ marginTop: "20px" }}
-                                    />
-                                    <InputField
-                                        name='regNo'
-                                        type='input'
-                                        placeholder='Registration Number'
-                                        style={{ marginTop: "20px" }}
-                                    />
-                                    <InputField
-                                        icon='user'
-                                        placeholder='Email ID'
-                                        name='email'
-                                        type='email'
-                                        style={{ marginTop: "20px" }}
-                                    />
-                                    <InputField
-                                        icon='lock'
-                                        placeholder='Password'
-                                        name='password'
-                                        type='password'
-                                        style={{ marginTop: "20px" }}
-                                    />
-                                </Segment>
-                                <Button
-                                    disabled={isSubmitting}
-                                    type='submit'
-                                    color='violet'
-                                    fluid
-                                    size='large'>
-                                    REGISTER
-                                </Button>
-                                {/* <pre>{JSON.stringify(values, null, 2)}</pre>
-                                <pre>
-                                    Errors: {JSON.stringify(errors, null, 2)}
-                                </pre> */}
-                            </FormikForm>
-                        )}
-                    </Formik>
-                    <Message>
-                        Already a user?
-                        <a href='/login'> Login</a>
-                    </Message>
-                </Grid.Column>
-            </Grid>
-        </div>
+        <>
+            {isLoading && (
+                <div
+                    style={{
+                        width: "100%",
+                        textAlign: "center",
+                        paddingTop: "20%",
+                    }}>
+                    <img src='/svg/spinner.svg' />
+                </div>
+            )}
+            {data && (
+                <Grid
+                    textAlign='center'
+                    style={{ height: "100vh" }}
+                    verticalAlign='middle'>
+                    <Grid.Column style={{ maxWidth: 450 }}>
+                        <Header
+                            as='h1'
+                            color='violet'
+                            textAlign='center'
+                            style={{ fontSize: "2.5em", marginBottom: "1em" }}>
+                            Register
+                        </Header>
+                        <Form onSubmit={onSubmit} style={{ textAlign: "left" }}>
+                            <Segment stacked size='big'>
+                                <Form.Input
+                                    name='name'
+                                    label='Name'
+                                    required
+                                    type='input'
+                                    placeholder='Name'
+                                    onChange={onChange}
+                                />
+                                <Form.Input
+                                    name='regNo'
+                                    type='input'
+                                    required
+                                    label='Registration Number'
+                                    placeholder='Registration Number'
+                                    onChange={onChange}
+                                />
+                                <Form.Input
+                                    icon='user'
+                                    name='email'
+                                    placeholder='Email'
+                                    label='Email'
+                                    required
+                                    // error={{
+                                    //     content:
+                                    //         "Please enter a valid email address",
+                                    //     pointing: "below",
+                                    // }}
+                                    onChange={onChange}
+                                />
+                                <Form.Input
+                                    icon='lock'
+                                    placeholder='Password'
+                                    label='Password'
+                                    name='password'
+                                    required
+                                    type='password'
+                                    onChange={onChange}
+                                />
+                                <Form.Select
+                                    name='department'
+                                    label='Department'
+                                    required
+                                    options={departmentOptions}
+                                    placeholder='Your Department'
+                                    style={{
+                                        width: "100%",
+                                    }}
+                                    onChange={onSelectChange}
+                                />
+                                <Form.Select
+                                    name='type'
+                                    label='Category'
+                                    required
+                                    options={typeOptions}
+                                    placeholder='Student or Faculty?'
+                                    onChange={onSelectChange}
+                                />
+                            </Segment>
+                            <Button
+                                onClick={() => {
+                                    console.log("Submit clicked");
+                                }}
+                                type='submit'
+                                color='violet'
+                                fluid
+                                size='large'>
+                                REGISTER
+                            </Button>
+                        </Form>
+                        {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
+                        {/* <pre>
+                                        Errors:{" "}
+                                        {JSON.stringify(errors, null, 2)}
+                                    </pre> */}
+
+                        <Message>
+                            Already a user?
+                            <a href='/login'> Login</a>
+                        </Message>
+                    </Grid.Column>
+                </Grid>
+            )}
+        </>
     );
 }
 
