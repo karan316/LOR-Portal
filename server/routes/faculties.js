@@ -10,7 +10,6 @@ router.get("/", async (req, res) => {
             type: "faculty",
         });
 
-        console.log("faculties: ", faculties);
         res.send(faculties);
     } catch (error) {
         res.status(400).send(error);

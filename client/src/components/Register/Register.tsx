@@ -15,7 +15,7 @@ import { useHistory } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
 import { register } from "../../services/userService";
 import http from "../../services/http";
-import { department, departmentList } from "../../services/departments";
+import { Department, DepartmentList } from "../../services/departments";
 
 function Register() {
     const history = useHistory();
@@ -40,13 +40,13 @@ function Register() {
         return data;
     });
 
-    let departmentOptions: departmentList[] = [];
+    let departmentOptions: DepartmentList[] = [];
     if (data) {
         console.log(data);
 
-        const departments: department[] = data;
+        const departments: Department[] = data;
         departmentOptions = departments.map(
-            (dept: department): departmentList => {
+            (dept: Department): DepartmentList => {
                 return {
                     key: dept._id,
                     text: dept.name,
@@ -129,11 +129,6 @@ function Register() {
                                     placeholder='Email'
                                     label='Email'
                                     required
-                                    // error={{
-                                    //     content:
-                                    //         "Please enter a valid email address",
-                                    //     pointing: "below",
-                                    // }}
                                     onChange={onChange}
                                 />
                                 <Form.Input

@@ -37,6 +37,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    applications: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Application",
+        },
+    ],
 });
 
 const User = mongoose.model("User", userSchema);
@@ -68,6 +74,7 @@ function generateToken(user) {
             email: user.email,
             regNo: user.regNo,
             name: user.name,
+            department: user.department,
             type: user.type,
             id: user._id,
         },

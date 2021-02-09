@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Button, Menu, Container, Header } from "semantic-ui-react";
 import { useHistory } from "react-router-dom";
 
-import StudentTable from "./StudentTable";
+import StudentTable from "../Tables/StudentTable";
 import { AuthContext } from "../../context/authContext";
 
 function StudentDashboard() {
@@ -11,7 +11,7 @@ function StudentDashboard() {
 
     return (
         <div>
-            <Menu style={{ fontSize: "1rem" }}>
+            <Menu style={{ fontSize: "1.5rem" }}>
                 {user.name ? (
                     <Menu.Item position='left'>
                         <Header>Hi, {user.name}!</Header>

@@ -1,56 +1,47 @@
-import React, { useState } from "react";
-import { department, departmentList } from "../../services/departments";
+import React, { useState, useContext } from "react";
+import { Department, DepartmentList } from "../../services/departments";
 import { Button, Form, Select, TextArea, Container } from "semantic-ui-react";
-import { useQuery } from "react-query";
-import { AxiosResponse } from "axios";
+import { useQuery, useMutation } from "react-query";
+import axios, { AxiosResponse } from "axios";
 
 import { useHistory } from "react-router-dom";
 import http from "../../services/http";
-import { getTeacherList } from "../../services/teachers";
+import { Faculty, FacultyList } from "../../services/teachers";
 import { useForm } from "../../hooks/useForm";
+import { AuthContext } from "../../context/authContext";
+import { Application } from "../../services/user";
 
-const teachers = getTeacherList();
-
-interface SubmitData {
-    name: string;
+interface FormData {
     statementOfPurpose: string;
-    teacher: string;
+    faculty: string;
     department: string;
-    registrationNumber: string;
 }
-//TODO: fetch teachers based on selected department
 function ApplicationForm() {
+    const { user } = useContext(AuthContext);
     const [selectedDepartment, setSelectedDepartment] = useState("");
     const [errors, setErrors] = useState({});
     const history = useHistory();
-    const initialState: SubmitData = {
-        name: "",
+    const initialState: FormData = {
         statementOfPurpose: "",
-        teacher: "",
+        faculty: "",
         department: "",
-        registrationNumber: "",
     };
-    const { data, error, isLoading } = useQuery(
-        "fetchDepartments",
-        async () => {
-            const { data } = await http.get(
-                "http://localhost:4000/api/departments"
-            );
-            return data;
-        }
-    );
-    const { onChange, onSubmit, onSelectChange, values } = useForm<SubmitData>(
+    const { data: departmentData } = useQuery("fetchDepartments", async () => {
+        const { data } = await http.get(
+            "http://localhost:4000/api/departments"
+        );
+        return data;
+    });
+    const { onChange, onSubmit, onSelectChange, values } = useForm<FormData>(
         applicationFormCallback,
         initialState
     );
 
-    let departmentOptions: departmentList[] = [];
-    if (data) {
-        console.log(data);
-
-        const departments: department[] = data;
+    let departmentOptions: DepartmentList[] = [];
+    if (departmentData) {
+        const departments: Department[] = departmentData;
         departmentOptions = departments.map(
-            (dept: department): departmentList => {
+            (dept: Department): DepartmentList => {
                 return {
                     key: dept._id,
                     text: dept.name,
@@ -60,20 +51,55 @@ function ApplicationForm() {
         );
     }
 
+    // const postApplication = useMutation(
+    //     (application) =>
+    //         axios.post("http://localhost:4000/api/applications/", application),
+
+    //     {
+    //         onSuccess: (data) => {
+    //             console.log(
+    //                 "Application submitted successfully. Response: ",
+    //                 data
+    //             );
+    //         },
+    //         onError: (error) => {
+    //             console.log("Application submission failed. ", error);
+    //         },
+    //     }
+    // );
+
     async function applicationFormCallback() {
-        let response: AxiosResponse | undefined;
+        let application = {
+            faculty: "",
+            facultyDepartment: "",
+            student: "",
+            studentDepartment: "",
+            statementOfPurpose: "",
+            status: "pending",
+        };
+        application.faculty = values.faculty;
+        application.facultyDepartment = values.department;
+        application.statementOfPurpose = values.statementOfPurpose;
+        application.student = user.id;
+        application.studentDepartment = user.department.name;
         try {
+            const response: AxiosResponse | undefined = await http.post(
+                "http://localhost:4000/api/applications/",
+                application,
+                {
+                    headers: {
+                        Authorization: localStorage.getItem("jwtToken"),
+                    },
+                }
+            );
+            console.log("Application submitted successfully. ", response?.data);
+            history.goBack();
         } catch (error) {
-            console.log("Application Form Submit error: ", error);
+            console.log("Could not submit application: ", error);
         }
     }
 
-    const {
-        data: facultyData,
-        error: facultyError,
-        isLoading: isFacultyLoading,
-        refetch,
-    } = useQuery(
+    const { data, isLoading, refetch } = useQuery(
         "fetchFaculty",
         async () => {
             const { data } = await http.get(
@@ -86,11 +112,25 @@ function ApplicationForm() {
             enabled: false,
         }
     );
-    function fetchTeachers(values: SubmitData) {
-        // fetch teachers based on department
+    async function fetchFaculty(values: FormData) {
         setSelectedDepartment(values.department);
-        refetch();
-        console.log("facultyData", facultyData);
+        await refetch();
+    }
+
+    let facultyOptions: FacultyList[] = [];
+    if (data) {
+        const faculties: Faculty[] = data;
+        facultyOptions = faculties
+            .filter((faculty: Faculty) => {
+                return faculty.department.name === selectedDepartment;
+            })
+            .map((faculty: Faculty) => {
+                return {
+                    key: faculty._id,
+                    text: faculty.name,
+                    value: faculty._id,
+                };
+            });
     }
     return (
         <Container style={{ padding: "4em", marginTop: "2.5em" }}>
@@ -114,18 +154,19 @@ function ApplicationForm() {
                         <Button
                             style={{ marginTop: "1.8em" }}
                             type='button'
-                            onClick={() => fetchTeachers(values)}>
+                            loading={isLoading}
+                            onClick={() => fetchFaculty(values)}>
                             CONFIRM
                         </Button>
                     </Form.Field>
                 </Form.Group>
                 <Form.Field
                     control={Select}
-                    label='Teacher'
-                    name='teacher'
+                    label='Faculty'
+                    name='faculty'
                     required
-                    options={teachers}
-                    placeholder='Teacher'
+                    options={facultyOptions}
+                    placeholder='Faculty'
                     onChange={onSelectChange}
                 />
                 <Form.Input

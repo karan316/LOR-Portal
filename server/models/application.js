@@ -3,33 +3,25 @@ const mongoose = require("mongoose");
 
 const applicationSchema = new mongoose.Schema({
     faculty: {
-        type: {
-            _id: mongoose.Schema.Types.ObjectId,
-            info: {
-                _id: mongoose.Schema.Types.ObjectId,
-                name: String,
-                department: {
-                    _id: mongoose.Schema.Types.ObjectId,
-                    name: String,
-                },
-            },
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
     student: {
-        type: {
-            _id: mongoose.Schema.Types.ObjectId,
-            info: {
-                _id: mongoose.Schema.Types.ObjectId,
-                name: String,
-                department: {
-                    _id: mongoose.Schema.Types.ObjectId,
-                    name: String,
-                },
-            },
-        },
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
     },
+    // TODO: use ref: "Department instead of string"
+    facultyDepartment: {
+        type: String,
+        required: true,
+    },
+    studentDepartment: {
+        type: String,
+        required: true,
+    },
+
     statementOfPurpose: {
         type: String,
         required: true,
@@ -44,8 +36,10 @@ const Application = mongoose.model("Application", applicationSchema);
 
 function validateApplication(application) {
     const schema = Joi.object({
-        facultyId: Joi.string().required(),
-        studentId: Joi.string().required(),
+        faculty: Joi.string().required(),
+        student: Joi.string().required(),
+        facultyDepartment: Joi.string().required(),
+        studentDepartment: Joi.string().required(),
         statementOfPurpose: Joi.string().required().min(10),
         status: Joi.string().required(),
     });

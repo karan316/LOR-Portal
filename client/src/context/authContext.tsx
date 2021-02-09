@@ -19,6 +19,7 @@ if (localStorage.getItem("jwtToken")) {
 // used to access our context
 const AuthContext = createContext({
     user: {
+        id: "",
         email: "",
         name: "",
         department: { name: "" },
@@ -37,6 +38,7 @@ interface Action {
 interface AuthReducerState {
     user:
         | {
+              id: string;
               email: string;
               name: string;
               department: { name: string };

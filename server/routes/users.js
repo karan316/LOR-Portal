@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const express = require("express");
 const router = express.Router();
 const { Department } = require("../models/department");
+const { Application } = require("../models/application");
 const {
     User,
     validateRegisterInput,
@@ -19,7 +20,9 @@ router.get("/", async (req, res) => {
 });
 router.get("/:id", auth, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id)
+            .populate("applications")
+            .select("-password");
         if (!user) {
             res.status(404).send("User not found");
             return;
@@ -32,7 +35,6 @@ router.get("/:id", auth, async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        console.log("Submit data: ", req.body);
         const { error } = validateRegisterInput(req.body);
         if (error) {
             res.status(400).send(error);
