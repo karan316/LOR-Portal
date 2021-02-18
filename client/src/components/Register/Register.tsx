@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "semantic-ui-css/semantic.min.css";
 import {
     Button,
@@ -16,6 +16,7 @@ import { useForm } from "../../hooks/useForm";
 import { register } from "../../services/userService";
 import http from "../../services/http";
 import { Department, DepartmentList } from "../../services/departments";
+import { AuthContext } from "../../context/authContext";
 
 function Register() {
     const history = useHistory();
@@ -28,7 +29,7 @@ function Register() {
         type: "",
     };
     const [errors, setErrors] = useState({});
-
+    const { setUser } = useContext(AuthContext);
     const { onChange, onSubmit, onSelectChange, values } = useForm(
         registerUserCallback,
         initialState
@@ -72,8 +73,7 @@ function Register() {
         let response: AxiosResponse | undefined;
         try {
             response = await register(values);
-            console.log(response.data);
-            localStorage.setItem("jwtToken", response.data.token);
+            setUser(response.data);
             history.push("/dashboard");
         } catch (error) {
             setErrors(error);
@@ -171,12 +171,6 @@ function Register() {
                                 REGISTER
                             </Button>
                         </Form>
-                        {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
-                        {/* <pre>
-                                        Errors:{" "}
-                                        {JSON.stringify(errors, null, 2)}
-                                    </pre> */}
-
                         <Message>
                             Already a user?
                             <a href='/login'> Login</a>

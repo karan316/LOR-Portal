@@ -1,12 +1,38 @@
 import React from "react";
 import { Button, Icon, Modal, Container, Header } from "semantic-ui-react";
+import { AxiosResponse } from "axios";
 import { Application } from "../../services/user";
+import http from "../../services/http";
 
 type ViewButtonProps = {
     application: Application;
 };
 
 const ViewButton: React.FC<ViewButtonProps> = ({ application }) => {
+    const handleButtonClick = async (
+        updatedStatus: "accepted" | "pending" | "rejected"
+    ) => {
+        try {
+            const response: AxiosResponse | undefined = await http.patch(
+                `http://localhost:4000/api/applications/${application._id}`,
+                {
+                    status: updatedStatus,
+                },
+                {
+                    headers: {
+                        Authorization: localStorage.getItem("jwtToken"),
+                    },
+                }
+            );
+            console.log(
+                `Application status changed from ${application.status} to ${updatedStatus}`,
+                response?.data
+            );
+        } catch (error) {
+            console.log("Could not submit application: ", error);
+        }
+    };
+
     return (
         <Modal trigger={<Button color='teal'>View</Button>} closeIcon>
             <Modal.Header>Application ID: {application._id}</Modal.Header>
@@ -37,19 +63,28 @@ const ViewButton: React.FC<ViewButtonProps> = ({ application }) => {
                 </Modal.Description>
             </Modal.Content>
             <Modal.Actions>
-                <Button animated='fade' color='red'>
+                <Button
+                    animated='fade'
+                    color='red'
+                    onClick={() => handleButtonClick("rejected")}>
                     <Button.Content visible>Reject LOR</Button.Content>
                     <Button.Content hidden>
                         <Icon name='close' />
                     </Button.Content>
                 </Button>
-                <Button animated='fade' color='blue'>
+                <Button
+                    animated='vertical'
+                    color='blue'
+                    onClick={() => handleButtonClick("pending")}>
                     <Button.Content visible>Under Review</Button.Content>
                     <Button.Content hidden>
                         <Icon name='circle outline' />
                     </Button.Content>
                 </Button>
-                <Button animated='fade' color='green'>
+                <Button
+                    animated='fade'
+                    color='green'
+                    onClick={() => handleButtonClick("accepted")}>
                     <Button.Content visible>Grant LOR</Button.Content>
                     <Button.Content hidden>
                         <Icon name='check' />

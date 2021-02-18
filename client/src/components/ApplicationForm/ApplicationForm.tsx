@@ -184,8 +184,6 @@ function ApplicationForm() {
                         Submit
                     </Button>
                 </Form.Field>
-                <pre>{JSON.stringify(values, null, 2)}</pre>
-                <pre>Errors: {JSON.stringify(errors, null, 2)}</pre>
             </Form>
         </Container>
     );
