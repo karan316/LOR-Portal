@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Button, Menu, Container, Header } from "semantic-ui-react";
+import { Button, Menu, Container, Header, Icon } from "semantic-ui-react";
 import TeacherTable from "../Tables/TeacherTable";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../context/authContext";
@@ -14,9 +14,7 @@ function TeacherDashboard() {
                     <Menu.Item position='left'>
                         <Header>Hi, {user.name}!</Header>
                     </Menu.Item>
-                ) : (
-                    <div>loading...</div>
-                )}
+                ) : null}
                 <Menu.Item position='right'>
                     <Button onClick={() => history.push("/login")}>
                         Log Out

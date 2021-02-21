@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
-import { Table } from "semantic-ui-react";
+import { Table, Message, Icon } from "semantic-ui-react";
 import { Application } from "../../services/user";
 import { useQuery } from "react-query";
 import http from "../../services/http";
 import { AuthContext } from "../../context/authContext";
+
 function StudentTable() {
     const [studentApplications, setStudentApplications] = useState<
         Application[]
@@ -53,41 +54,63 @@ function StudentTable() {
                 fixed
                 verticalAlign='middle'
                 style={{ fontSize: "1.5rem" }}>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Application ID</Table.HeaderCell>
-                        <Table.HeaderCell>Teacher</Table.HeaderCell>
-                        <Table.HeaderCell>Department</Table.HeaderCell>
-                        <Table.HeaderCell>Status</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {studentApplications &&
-                        studentApplications.map(
-                            (studentApplication: Application) => (
-                                <Table.Row key={studentApplication._id}>
-                                    <Table.Cell>
-                                        {studentApplication._id}
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {studentApplication.faculty.name}
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {studentApplication.facultyDepartment}
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        negative={getNegativeStatus(
-                                            studentApplication.status
-                                        )}
-                                        positive={getPositiveStatus(
-                                            studentApplication.status
-                                        )}>
-                                        {studentApplication.status}
-                                    </Table.Cell>
-                                </Table.Row>
-                            )
-                        )}
-                </Table.Body>
+                <Table.Row style={{ margin: "0 auto" }}>
+                    {!studentApplications && (
+                        <Message icon>
+                            <Icon
+                                name='circle notched'
+                                loading
+                                color='violet'
+                            />
+                            <Message.Content>
+                                <Message.Header>Just a moment</Message.Header>
+                                Searching for your applications...
+                            </Message.Content>
+                        </Message>
+                    )}
+                </Table.Row>
+                {studentApplications && (
+                    <>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>
+                                    Application ID
+                                </Table.HeaderCell>
+                                <Table.HeaderCell>Teacher</Table.HeaderCell>
+                                <Table.HeaderCell>Department</Table.HeaderCell>
+                                <Table.HeaderCell>Status</Table.HeaderCell>
+                            </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                            {studentApplications.map(
+                                (studentApplication: Application) => (
+                                    <Table.Row key={studentApplication._id}>
+                                        <Table.Cell>
+                                            {studentApplication._id}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {studentApplication.faculty.name}
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            {
+                                                studentApplication.facultyDepartment
+                                            }
+                                        </Table.Cell>
+                                        <Table.Cell
+                                            negative={getNegativeStatus(
+                                                studentApplication.status
+                                            )}
+                                            positive={getPositiveStatus(
+                                                studentApplication.status
+                                            )}>
+                                            {studentApplication.status}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                )
+                            )}
+                        </Table.Body>
+                    </>
+                )}
             </Table>
         </div>
     );

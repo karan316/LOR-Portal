@@ -6,6 +6,7 @@ import {
     Header,
     Message,
     Segment,
+    Icon,
     Form,
 } from "semantic-ui-react";
 import { useQuery } from "react-query";
@@ -89,7 +90,12 @@ function Register() {
                         textAlign: "center",
                         paddingTop: "20%",
                     }}>
-                    <img src='/svg/spinner.svg' />
+                    <Icon
+                        name='circle notched'
+                        loading
+                        color='violet'
+                        size='huge'
+                    />
                 </div>
             )}
             {data && (

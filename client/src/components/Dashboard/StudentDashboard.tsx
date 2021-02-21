@@ -16,9 +16,7 @@ function StudentDashboard() {
                     <Menu.Item position='left'>
                         <Header>Hi, {user.name}!</Header>
                     </Menu.Item>
-                ) : (
-                    <div>loading...</div>
-                )}
+                ) : null}
                 <Menu.Item position='right'>
                     <Button
                         onClick={() => {

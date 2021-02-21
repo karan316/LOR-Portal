@@ -38,7 +38,7 @@ function Login() {
             setUser(response.data);
             history.push("/dashboard");
         } catch (error) {
-            setErrors(error);
+            setErrors(error.response.data);
             console.log("Server Error occurred: ", error);
         }
     }
@@ -67,6 +67,14 @@ function Login() {
                         Log In
                     </Header>
                     <Form onSubmit={onSubmit} style={{ textAlign: "left" }}>
+                        {Object.keys(errors).length !== 0 && (
+                            <Message negative>
+                                <Message.Header>
+                                    LOGIN UNSUCCESSFUL
+                                </Message.Header>
+                                <p>{errors}</p>
+                            </Message>
+                        )}
                         <Segment stacked size='big'>
                             <Form.Input
                                 name='email'
