@@ -1,15 +1,21 @@
 import React, { useState, useContext } from "react";
 import { Department, DepartmentList } from "../../services/departments";
-import { Button, Form, Select, TextArea, Container } from "semantic-ui-react";
-import { useQuery, useMutation } from "react-query";
-import axios, { AxiosResponse } from "axios";
+import {
+    Button,
+    Form,
+    Select,
+    TextArea,
+    Container,
+    Message,
+} from "semantic-ui-react";
+import { useQuery } from "react-query";
+import { AxiosResponse } from "axios";
 
 import { useHistory } from "react-router-dom";
 import http from "../../services/http";
 import { Faculty, FacultyList } from "../../services/teachers";
 import { useForm } from "../../hooks/useForm";
 import { AuthContext } from "../../context/authContext";
-import { Application } from "../../services/user";
 
 interface FormData {
     statementOfPurpose: string;
@@ -19,7 +25,7 @@ interface FormData {
 function ApplicationForm() {
     const { user } = useContext(AuthContext);
     const [selectedDepartment, setSelectedDepartment] = useState("");
-    const [errors, setErrors] = useState({});
+    const [validationError, setValidationError] = useState<string>("");
     const history = useHistory();
     const initialState: FormData = {
         statementOfPurpose: "",
@@ -51,23 +57,6 @@ function ApplicationForm() {
         );
     }
 
-    // const postApplication = useMutation(
-    //     (application) =>
-    //         axios.post("http://localhost:4000/api/applications/", application),
-
-    //     {
-    //         onSuccess: (data) => {
-    //             console.log(
-    //                 "Application submitted successfully. Response: ",
-    //                 data
-    //             );
-    //         },
-    //         onError: (error) => {
-    //             console.log("Application submission failed. ", error);
-    //         },
-    //     }
-    // );
-
     async function applicationFormCallback() {
         let application = {
             faculty: "",
@@ -82,20 +71,39 @@ function ApplicationForm() {
         application.statementOfPurpose = values.statementOfPurpose;
         application.student = user.id;
         application.studentDepartment = user.department.name;
-        try {
-            const response: AxiosResponse | undefined = await http.post(
-                "http://localhost:4000/api/applications/",
-                application,
-                {
-                    headers: {
-                        Authorization: localStorage.getItem("jwtToken"),
-                    },
-                }
-            );
-            console.log("Application submitted successfully. ", response?.data);
-            history.goBack();
-        } catch (error) {
-            console.log("Could not submit application: ", error);
+        const allowSubmission = (): boolean => {
+            if (values.faculty.length < 0) {
+                setValidationError("Please select a faculty.");
+            }
+            if (values.statementOfPurpose.length < 10) {
+                setValidationError(
+                    "Statement of purpose should be at least 10 characters."
+                );
+            }
+            if (validationError.length === 0) return false;
+            return true;
+        };
+
+        if (allowSubmission()) {
+            try {
+                const response: AxiosResponse | undefined = await http.post(
+                    "http://localhost:4000/api/applications/",
+                    application,
+                    {
+                        headers: {
+                            Authorization: localStorage.getItem("jwtToken"),
+                        },
+                    }
+                );
+                console.log(
+                    "Application submitted successfully. ",
+                    response?.data
+                );
+                history.goBack();
+            } catch (error) {
+                // TODO: display error message to the user
+                console.log("Could not submit application: ", error);
+            }
         }
     }
 
@@ -160,15 +168,33 @@ function ApplicationForm() {
                         </Button>
                     </Form.Field>
                 </Form.Group>
-                <Form.Field
-                    control={Select}
-                    label='Faculty'
-                    name='faculty'
-                    required
-                    options={facultyOptions}
-                    placeholder='Faculty'
-                    onChange={onSelectChange}
-                />
+                {facultyOptions.length !== 0 ? (
+                    <Form.Field
+                        control={Select}
+                        label='Faculty'
+                        name='faculty'
+                        required
+                        options={facultyOptions}
+                        placeholder='Faculty'
+                        onChange={onSelectChange}
+                    />
+                ) : (
+                    <Message>
+                        {selectedDepartment.length > 0 ? (
+                            <Message.Content>
+                                <Message.Header>
+                                    No faculty found for this department.
+                                </Message.Header>
+                                {`Please contact ${values.department} department for more information.`}
+                            </Message.Content>
+                        ) : (
+                            <Message.Content>
+                                Select a department and click{" "}
+                                <span style={{ fontWeight: 800 }}>CONFIRM</span>
+                            </Message.Content>
+                        )}
+                    </Message>
+                )}
                 <Form.Input
                     control={TextArea}
                     required
@@ -184,6 +210,11 @@ function ApplicationForm() {
                         Submit
                     </Button>
                 </Form.Field>
+                {validationError.length > 0 && selectedDepartment.length > 0 && (
+                    <Message error>
+                        <Message.Content>{validationError}</Message.Content>
+                    </Message>
+                )}
             </Form>
         </Container>
     );

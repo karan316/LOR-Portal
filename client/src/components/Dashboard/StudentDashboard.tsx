@@ -38,10 +38,14 @@ function StudentDashboard() {
                     Applications
                 </Header>
                 <Button
-                    style={{ marginTop: "2rem", fontSize: "1.2rem" }}
+                    style={{
+                        marginTop: "2rem",
+                        fontSize: "1.2rem",
+                        padding: "1.2em 2em",
+                    }}
                     color='violet'
                     onClick={() => history.push("/new-application")}>
-                    Apply New
+                    APPLY NEW
                 </Button>
                 <Container style={{ marginTop: "6em" }}>
                     <StudentTable />
